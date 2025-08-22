@@ -261,17 +261,30 @@ if st.button("📄 Generate Report"):
             img_buffer2.seek(0)
             elements.append(Image(img_buffer2, width=400, height=200))
             elements.append(Spacer(1, 12))
-
+        
         # Resources
         elements.append(Paragraph("Useful Resources:", resource_heading_style))
+        
+        # Style for normal text
+        normal_text_style = ParagraphStyle(
+            'NormalTextStyle',
+            parent=styles['Normal'],
+            fontSize=12,
+            textColor=colors.black
+        )
+        
+        # Resources with clickable-looking URLs
         resources = [
-            "World Health Organization (WHO): https://www.who.int/india/health-topics/cardiovascular-diseases",
-            "World Heart Federation: https://world-heart-federation.org/",
-            "Healthy Lifestyle Guide: https://www.cdc.gov/heart-disease/prevention/index.html"
+            ("World Health Organization (WHO)", "https://www.who.int/india/health-topics/cardiovascular-diseases"),
+            ("World Heart Federation", "https://world-heart-federation.org/"),
+            ("Healthy Lifestyle Guide", "https://www.cdc.gov/heart-disease/prevention/index.html")
         ]
-        for r in resources:
-            elements.append(Paragraph(f"- {r}", normal_style))
-            elements.append(Spacer(1, 6))  # Adds vertical space after each line
+        
+        for name, url in resources:
+            # Use mini-HTML for URL styling
+            resource_line = f"{name}: <u><font color='#1F618D'>{url}</font></u>"
+            elements.append(Paragraph(resource_line, normal_text_style))
+            elements.append(Spacer(1, 6))
 
 
         doc.build(elements)
