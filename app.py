@@ -8,8 +8,6 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.graphics.shapes import Drawing
-from reportlab.graphics.barcode.qr import QrCodeWidget
 
 # -----------------------------
 # Load the saved model
@@ -36,13 +34,13 @@ with col1:
                       ["Select",
                        "Typical Angina (chest pain on exertion)", 
                        "Atypical Angina (chest pain not related to exertion)",
-                       "Non-anginal Pain (not heart-related)", 
-                       "Asymptomatic (no pain)"])
+                       "Non-heart-related chest pain", 
+                       "No chest pain"])
     cp = None if cp == "Select" else [
           "Typical Angina (chest pain on exertion)", 
           "Atypical Angina (chest pain not related to exertion)", 
-          "Non-anginal Pain (not heart-related)", 
-          "Asymptomatic (no pain)"].index(cp)
+          "Non-heart-related chest pain", 
+          "No chest pain"].index(cp)
     trestbps = st.number_input("Resting Blood Pressure (mm Hg)", 80, 200, value=120)
     chol = st.number_input("Cholesterol Level (mg/dl)", 100, 600, value=200)
     fbs = st.selectbox("Fasting Blood Sugar", ["≤120 mg/dl (Normal)", ">120 mg/dl (High)"], index=0)
@@ -52,19 +50,19 @@ with col1:
 
 with col2:
     restecg = st.selectbox("ECG Result", 
-                           ["Normal ECG", 
-                            "ST-T wave abnormality", 
-                            "Probable/definite left ventricular hypertrophy"], index=0)
-    restecg = ["Normal ECG", "ST-T wave abnormality", "Probable/definite left ventricular hypertrophy"].index(restecg)
-    thalach = st.number_input("Maximum Heart Rate Reached", 70, 220, value=150)
-    exang = st.selectbox("Exercise-induced Chest Pain", ["Select", "No chest pain after exercise", "Chest pain after exercise"])
-    exang = None if exang == "Select" else (0 if exang == "No chest pain after exercise" else 1)
-    oldpeak = st.number_input("ST Depression (compared to rest)", 0.0, 10.0, value=1.0, step=0.1)
-    slope = st.selectbox("Slope of Heart Rate Response", ["Select", "Upsloping (gradual increase)", "Flat (no change)", "Downsloping (decreases)"])
-    slope = None if slope == "Select" else ["Upsloping (gradual increase)", "Flat (no change)", "Downsloping (decreases)"].index(slope)
-    ca = st.selectbox("Number of Major Blood Vessels (0–3)", [0, 1, 2, 3], index=0)
-    thal = st.selectbox("Blood Flow Condition (Thalassemia Test)", ["Select", "Normal blood flow", "Fixed defect", "Reversible defect"])
-    thal = None if thal == "Select" else ["Normal blood flow", "Fixed defect", "Reversible defect"].index(thal) + 1
+                           ["Normal", 
+                            "Minor irregularities", 
+                            "Possible heart muscle enlargement"], index=0)
+    restecg = ["Normal", "Minor irregularities", "Possible heart muscle enlargement"].index(restecg)
+    thalach = st.number_input("Maximum Heart Rate Achieved", 70, 220, value=150)
+    exang = st.selectbox("Chest Pain During Exercise", ["Select", "No", "Yes"])
+    exang = None if exang == "Select" else (0 if exang == "No" else 1)
+    oldpeak = st.number_input("ST Depression (ECG reading)", 0.0, 10.0, value=1.0, step=0.1)
+    slope = st.selectbox("Heart Rate Response Slope During Exercise", ["Select", "Gradually increases", "No change", "Decreases"])
+    slope = None if slope == "Select" else ["Gradually increases", "No change", "Decreases"].index(slope)
+    ca = st.selectbox("Number of Major Heart Arteries with Narrowing (0–3)", [0, 1, 2, 3], index=0)
+    thal = st.selectbox("Blood Flow Test Result", ["Select", "Normal", "Permanent problem", "Temporary problem"])
+    thal = None if thal == "Select" else ["Normal", "Permanent problem", "Temporary problem"].index(thal) + 1
 
 # -----------------------------
 # Lifestyle Factors
@@ -91,7 +89,7 @@ if st.button("📄 Generate Report"):
         if prediction == 1:
             st.success("✅ Low Risk: You are unlikely to have heart disease.")
         else:
-            st.error("⚠️ High Risk: Patient likely has heart disease.")
+            st.error("⚠️ High Risk: You may have heart disease. Consult a doctor.")
 
         # -----------------------------
         # Detailed Analysis
@@ -100,17 +98,17 @@ if st.button("📄 Generate Report"):
         risk_factors = []
         weights = []
         age_note = ""
-        if age > 50: age_note = "Since age is a natural risk factor, regular screenings are recommended."
-        if trestbps > 130: risk_factors.append("High blood pressure detected."); weights.append(3)
-        if chol > 240: risk_factors.append("High cholesterol level."); weights.append(3)
-        if fbs == 1: risk_factors.append("High fasting blood sugar (possible diabetes risk)."); weights.append(2)
-        if exang == 1: risk_factors.append("Exercise-induced chest pain is a warning sign."); weights.append(2)
-        if oldpeak > 2: risk_factors.append("Significant ST depression (possible ischemia)."); weights.append(4)
-        if family_history == 1: risk_factors.append("Family history of heart disease."); weights.append(2)
-        if smoking: risk_factors.append("Smoking increases risk."); weights.append(2)
-        if alcohol: risk_factors.append("Alcohol consumption can increase risk."); weights.append(1)
-        if physical_activity == "Low": risk_factors.append("Low physical activity is a risk factor."); weights.append(2)
-        if stress == "High": risk_factors.append("High stress levels may contribute to heart disease."); weights.append(1)
+        if age > 50: age_note = "Age can increase risk; regular check-ups are recommended."
+        if trestbps > 130: risk_factors.append("High blood pressure"); weights.append(3)
+        if chol > 240: risk_factors.append("High cholesterol"); weights.append(3)
+        if fbs == 1: risk_factors.append("High blood sugar"); weights.append(2)
+        if exang == 1: risk_factors.append("Chest pain during exercise"); weights.append(2)
+        if oldpeak > 2: risk_factors.append("Significant ECG changes (possible heart stress)"); weights.append(4)
+        if family_history == 1: risk_factors.append("Family history of heart disease"); weights.append(2)
+        if smoking: risk_factors.append("Smoking increases risk"); weights.append(2)
+        if alcohol: risk_factors.append("Alcohol consumption increases risk"); weights.append(1)
+        if physical_activity == "Low": risk_factors.append("Low physical activity"); weights.append(2)
+        if stress == "High": risk_factors.append("High stress levels"); weights.append(1)
 
         if len(risk_factors) == 0 and not age_note: st.info("No major risk factors detected from inputs.")
         else:
@@ -122,7 +120,7 @@ if st.button("📄 Generate Report"):
         # -----------------------------
         st.subheader("📈 Visualization of Key Health Indicators")
         fig, ax = plt.subplots()
-        features = ["Age", "Resting BP", "Cholesterol", "Max HR", "ST Depression"]
+        features = ["Age", "Resting BP", "Cholesterol", "Max HR", "ECG ST Depression"]
         values = [age, trestbps, chol, thalach, oldpeak]
         ax.bar(features, values, color=['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336'])
         ax.set_ylabel("Value")
@@ -139,20 +137,20 @@ if st.button("📄 Generate Report"):
             st.pyplot(fig2)
 
         # -----------------------------
-        # Recommendations (display on page)
+        # Recommendations
         # -----------------------------
         st.subheader("🩺 Recommendations")
         st.markdown("""
         - Maintain a balanced diet low in saturated fats and cholesterol.  
-        - Engage in regular physical activity (consult your doctor before starting).  
-        - Monitor blood pressure, sugar, and cholesterol regularly.  
+        - Engage in regular physical activity (consult your doctor first).  
+        - Monitor blood pressure, blood sugar, and cholesterol regularly.  
         - Avoid smoking and limit alcohol intake.  
-        - Manage stress with mindfulness or relaxation exercises.  
+        - Manage stress with relaxation techniques.  
         - Schedule regular health check-ups.  
         """)
 
         # -----------------------------
-        # Footer with Contact / Resources
+        # Useful Resources
         # -----------------------------
         st.subheader("📌 Useful Resources")
         st.markdown("""
@@ -162,7 +160,7 @@ if st.button("📄 Generate Report"):
         """)
 
         # -----------------------------
-        # PDF Report Generation (Enhanced)
+        # PDF Report Generation
         # -----------------------------
         buffer = BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=A4)
@@ -171,18 +169,9 @@ if st.button("📄 Generate Report"):
 
         # Custom styles
         title_style = ParagraphStyle('TitleStyle', parent=styles['Title'], fontSize=24, textColor=colors.HexColor('#1A5276'), alignment=1)
-        heading_style = ParagraphStyle('HeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#E74C3C'))
-
-        # Changed heading colors
-        risk_heading_style = ParagraphStyle(
-            'RiskHeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#D35400')  # dark orange
-        )
-        rec_heading_style = ParagraphStyle(
-            'RecHeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#5B2C6F')  # purple
-        )
-        resource_heading_style = ParagraphStyle(
-            'ResourceHeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#1F618D')  # dark blue
-        )
+        risk_heading_style = ParagraphStyle('RiskHeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#D35400'))
+        rec_heading_style = ParagraphStyle('RecHeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#5B2C6F'))
+        resource_heading_style = ParagraphStyle('ResourceHeadingStyle', parent=styles['Heading2'], fontSize=16, textColor=colors.HexColor('#1F618D'))
         normal_style = ParagraphStyle('NormalStyle', parent=styles['Normal'], fontSize=12, textColor=colors.black)
 
         # Title
@@ -193,21 +182,13 @@ if st.button("📄 Generate Report"):
         elements.append(Paragraph(f"Date: {datetime.date.today()}", normal_style))
         elements.append(Spacer(1, 12))
         
-        # Dynamic Prediction Style
+        # Prediction
         prediction_color = colors.green if prediction == 1 else colors.red
-        prediction_style = ParagraphStyle(
-            'PredictionStyle',
-            parent=styles['Heading2'],
-            fontSize=16,
-            textColor=prediction_color,
-            alignment=1
-        )
+        prediction_style = ParagraphStyle('PredictionStyle', parent=styles['Heading2'], fontSize=16, textColor=prediction_color, alignment=1)
         elements.append(Paragraph(f"Prediction: {'Low Risk' if prediction==1 else 'High Risk'}", prediction_style))
-        
         elements.append(Spacer(1, 12))
         elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#BDC3C7")))
         elements.append(Spacer(1, 12))
-
 
         # Patient Details Table
         data = [
@@ -256,29 +237,24 @@ if st.button("📄 Generate Report"):
         recs = [
             "Maintain a balanced diet low in saturated fats and cholesterol.",
             "Engage in regular physical activity.",
-            "Monitor blood pressure, sugar, and cholesterol regularly.",
+            "Monitor blood pressure, blood sugar, and cholesterol regularly.",
             "Avoid smoking and limit alcohol intake.",
-            "Manage stress with mindfulness or relaxation exercises.",
+            "Manage stress with relaxation techniques.",
             "Schedule regular health check-ups."
         ]
         for r in recs: elements.append(Paragraph(f"- {r}", normal_style))
         elements.append(Spacer(1, 12))
 
         # Charts
-        # Bar chart (Patient Health Indicators)
         img_buffer = BytesIO()
         fig.savefig(img_buffer, format='PNG', bbox_inches='tight')
         img_buffer.seek(0)
-        
-        # Preserve aspect ratio
         fig_width, fig_height = fig.get_size_inches()
         aspect_ratio = fig_height / fig_width
-        img_width = 400  # desired width in PDF
+        img_width = 400
         img_height = img_width * aspect_ratio
-        
         elements.append(Image(img_buffer, width=img_width, height=img_height))
-        
-        # Pie chart remains same
+
         if prediction == 0 and risk_factors:
             img_buffer2 = BytesIO()
             fig2.savefig(img_buffer2, format='PNG', bbox_inches='tight')
@@ -286,8 +262,7 @@ if st.button("📄 Generate Report"):
             elements.append(Image(img_buffer2, width=400, height=200))
             elements.append(Spacer(1, 12))
 
-
-        # Footer / Resources in PDF
+        # Resources
         elements.append(Paragraph("Useful Resources:", resource_heading_style))
         resources = [
             "World Health Organization (WHO): https://www.who.int/india/health-topics/cardiovascular-diseases",
