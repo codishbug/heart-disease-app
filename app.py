@@ -296,6 +296,8 @@ if st.button("📄 Generate Report"):
         ]
         for r in resources:
             elements.append(Paragraph(f"- {r}", normal_style))
+            elements.append(Spacer(1, 6))  # Adds vertical space after each line
+
 
         doc.build(elements)
         buffer.seek(0)
