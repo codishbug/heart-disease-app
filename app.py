@@ -315,7 +315,7 @@ if st.button("📄 Generate Report"):
             img_buffer2 = BytesIO()
             fig2.savefig(img_buffer2, format='PNG', bbox_inches='tight')
             img_buffer2.seek(0)
-            elements.append(Image(img_buffer2, width=400, height=210))
+            elements.append(Image(img_buffer2, width=400, height=230))
             elements.append(Spacer(1, 12))
         
         # Resources
