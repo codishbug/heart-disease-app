@@ -21,6 +21,11 @@ hide_streamlit_style = """
     .block-container {
         padding-top: 1rem; /* reduce top padding */
     }
+
+    /* Hide "Manage app" floating button */
+    [data-testid="stStatusWidget"] {
+        visibility: hidden;
+    }
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
