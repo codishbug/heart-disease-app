@@ -21,6 +21,8 @@ st.markdown(
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+        min-height: 100vh;        /* Ensure full viewport height */
+        height: 100%;             /* Mobile-friendly */
     }
 
      /* Dark green text for most elements */
