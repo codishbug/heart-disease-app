@@ -9,17 +9,70 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
+
+# -----------------------------
+# Custom CSS (Background + Black Box)
+# -----------------------------
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-image: url("https://raw.githubusercontent.com/codishbug/heart-disease-app/main/Untitled%20design.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+     /* Dark green text for most elements */
+    .stApp, 
+    .stApp h1, 
+    .stApp h2, 
+    .stApp h3, 
+    .stApp h4, 
+    .stApp h5, 
+    .stApp h6, 
+    .stApp p, 
+    .stApp span, 
+    .stApp li, 
+    .stApp label, 
+    .stApp div[data-testid="stMarkdownContainer"] {
+        color: #006666 !important;  /* Dark green */
+    }
+
+    /* Keep input field text default (black) */
+    input, select, textarea {
+        color: initial !important;
+    }
+    
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # -----------------------------
 # Load the saved model
 # -----------------------------
 model = pickle.load(open("model.pkl", "rb"))
 
-st.title("🫀 Heart Disease Prediction")
 
+# Centered Title
 st.markdown("""
-Fill in the details below. The app will predict whether you may be at risk of heart disease.  
-*(This is not a medical diagnosis. Please consult a doctor for accurate advice.)*
-""")
+<div style="text-align: center;">
+    <h1>🫀 Heart Disease Prediction</h1>
+</div>
+""", unsafe_allow_html=True)
+
+# Centered Description
+st.markdown("""
+<div style="text-align: center; margin-bottom: 30px;">
+    Fill in the details below. The app will predict whether you may be at risk of heart disease.<br>
+    <em>(This is not a medical diagnosis. Please consult a doctor for accurate advice.)</em>
+</div>
+""", unsafe_allow_html=True)
+
+
+
+
 
 # -----------------------------
 # Collect input features
@@ -294,3 +347,4 @@ if st.button("📄 Generate Report"):
         buffer.seek(0)
 
         st.download_button("⬇️ Download PDF Report", buffer, file_name="heart_report.pdf", mime="application/pdf")
+
