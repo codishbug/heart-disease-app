@@ -23,8 +23,14 @@ hide_streamlit_style = """
     }
 
     /* Hide "Manage app" floating button */
-    [data-testid="stStatusWidget"] {
-        visibility: hidden;
+    div[data-testid="stActionButton"] {
+        display: none;
+    }
+    div[data-testid="stStatusWidget"] {
+        display: none;
+    }
+    [title="Manage app"] {
+        display: none !important;
     }
     </style>
 """
