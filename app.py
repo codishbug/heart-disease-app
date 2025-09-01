@@ -255,6 +255,9 @@ if st.button("📄 Generate Report"):
         img_height = img_width * aspect_ratio
         elements.append(Image(img_buffer, width=img_width, height=img_height))
 
+        elements.append(Spacer(1, 12))
+
+
         if prediction == 0 and risk_factors:
             img_buffer2 = BytesIO()
             fig2.savefig(img_buffer2, format='PNG', bbox_inches='tight')
