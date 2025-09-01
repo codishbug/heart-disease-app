@@ -16,6 +16,11 @@ hide_streamlit_style = """
     #MainMenu {visibility: hidden;}
     header {visibility: hidden;}
     footer {visibility: hidden;}
+
+    /* Shift content up */
+    .block-container {
+        padding-top: 1rem; /* reduce top padding */
+    }
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
